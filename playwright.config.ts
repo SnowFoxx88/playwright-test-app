@@ -1,6 +1,7 @@
-import { defineConfig, devices } from '@playwright/test';
-import type { TestOptions} from "./test-options";
-
+import { defineConfig, devices } from '@playwright/test'
+import type { TestOptions} from "./test-options"
+// @ts-ignore
+import { createArgosReporterOptions} from '@argos-ci/playwright/reporter'
 
 import dotenv from 'dotenv';
 import path from 'path';
@@ -16,6 +17,14 @@ export default defineConfig<TestOptions>({
 
   retries: 0,
   reporter: [
+    process.env.CI ? ["dot"] : ["list"],
+    [
+      "@argos-ci/playwright/reporter",
+      createArgosReporterOptions({
+        // Upload to Argos on CI only.
+        uploadToArgos: !!process.env.CI,
+      }),
+    ],
     ['json', {outputFile: 'test-results/jsonReport.json'}],
     ['junit', {outputFile: 'test-results/junitReporter.xml'}],
     // ['allure-playwright'],
@@ -28,6 +37,7 @@ export default defineConfig<TestOptions>({
           : 'http://localhost:4200/',
 
     trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
     actionTimeout: 20000,
     navigationTimeout: 25000,
     video: {

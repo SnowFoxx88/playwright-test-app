@@ -8,11 +8,7 @@ jobs:
   playwright-tests:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        shardIndex: [1, 2, 3, 4]
-        shardTotal: [4]
+
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -26,10 +22,10 @@ jobs:
       - name: Run Playwright tests
         run: npm run pageObjects-chrome
 
-      - name: Upload blob report to GitHub Actions Artifacts
+      - name: Upload playwright-report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: blob-report-${{ matrix.shardIndex }}
-          path: blob-report
+          name: playwright-report
+          path: playwright-report
           retention-days: 1
